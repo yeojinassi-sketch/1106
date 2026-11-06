@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>민원처리 현황 시각화 개선 | 의사결정 요약</title>
+<style>
+:root{--ink:#17283b;--muted:#607183;--line:#dce5ed;--navy:#163b62;--blue:#eaf3fc;--bg:#f4f7fb;--white:#fff;--amber:#fff4df;--amberink:#765018}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:"Pretendard","Noto Sans KR","Malgun Gothic",Arial,sans-serif;color:var(--ink);line-height:1.48}
+.page{width:min(1120px,calc(100% - 40px));margin:28px auto 36px}.masthead{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:0 0 18px;border-bottom:3px solid var(--navy)}
+.kicker{font-size:12px;letter-spacing:.12em;font-weight:800;color:var(--navy);margin-bottom:8px}h1{font-size:28px;line-height:1.25;margin:0 0 7px;letter-spacing:-.045em}.subtitle{font-size:14px;color:var(--muted);margin:0}.tag{border:1px solid var(--line);border-radius:20px;padding:7px 12px;background:white;color:#51657a;font-weight:700;font-size:12px;white-space:nowrap}
+.summary{display:flex;align-items:center;justify-content:space-between;gap:22px;background:var(--navy);color:white;border-radius:13px;padding:20px 24px;margin:20px 0}.summary strong{display:block;font-size:18px;line-height:1.4;margin-bottom:4px}.summary p{margin:0;color:#d8e7f4;font-size:13px}.summary .focus{font-size:12px;white-space:nowrap;border:1px solid #91abc2;border-radius:7px;padding:8px 11px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;break-inside:avoid}.panel h2{font-size:16px;letter-spacing:-.025em;margin:0 0 13px;display:flex;align-items:center;gap:9px}.num{display:inline-grid;place-items:center;width:25px;height:25px;background:#e5eff9;border-radius:7px;font-size:12px;color:var(--navy)}.panel p{font-size:13px;margin:0 0 10px}.panel p:last-child{margin-bottom:0}.lines{list-style:none;margin:0;padding:0}.lines li{position:relative;padding:0 0 10px 14px;font-size:13px}.lines li:last-child{padding-bottom:0}.lines li:before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;background:#4f7ca9;border-radius:50%}.mini-title{font-size:11px;font-weight:800;color:#527294;letter-spacing:.04em;margin-bottom:7px}.problem{display:grid;gap:8px}.problem div{padding:9px 11px;background:#f4f7fb;border-radius:7px;font-size:13px}.problem strong{color:#153b61}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.action{padding:10px 11px;border-radius:8px;background:#f1f6fc;border:1px solid #e1eaf4;font-size:12px;min-height:61px}.action b{display:block;font-size:13px;color:#234d74;margin-bottom:3px}.decision{grid-column:1/-1;background:#fff;border-color:#c9d8e8}.decision-inner{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}.decision .core{padding:13px 15px;background:var(--blue);border-radius:9px}.decision .core strong{font-size:14px;display:block;margin-bottom:5px;color:#174873}.decision .core p{margin:0;font-size:13px}.decision .choices{display:grid;grid-template-columns:1fr 1fr;gap:7px}.decision .choices span{background:#f5f8fb;border:1px solid var(--line);border-radius:7px;padding:9px 10px;font-size:12px;font-weight:650}.foot{margin-top:15px;border:1px solid #efd9af;background:var(--amber);border-radius:12px;padding:14px 19px;display:flex;gap:15px;align-items:baseline}.foot h2{font-size:15px;color:var(--amberink);white-space:nowrap;margin:0}.foot p{font-size:12px;color:#604d2c;margin:0}.source{margin-top:12px;display:flex;justify-content:space-between;gap:12px;color:#718094;font-size:11px}
+@media(max-width:720px){.page{width:calc(100% - 24px);margin:16px auto}.masthead{flex-direction:column}h1{font-size:23px}.summary{flex-direction:column;align-items:flex-start}.grid{grid-template-columns:1fr}.decision{grid-column:auto}.decision-inner{grid-template-columns:1fr}.foot{display:block}.foot h2{margin-bottom:5px}.source{display:block}}
+@media print{@page{size:A4 portrait;margin:10mm}body{background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}.page{width:100%;margin:0}.masthead{padding-bottom:12px}h1{font-size:23px}.summary{margin:12px 0;padding:14px 18px}.grid{gap:10px}.panel{padding:13px 15px}.panel h2{margin-bottom:9px}.problem{gap:6px}.problem div{padding:7px 9px}.actions{gap:6px}.action{padding:7px 9px;min-height:auto}.lines li{padding-bottom:6px}.decision-inner{gap:14px}.foot{margin-top:10px;padding:10px 14px}.source{margin-top:8px}}
+
+/* 세로형 1페이지: 위에서 아래로 읽는 구성 */
+.page{width:min(760px,calc(100% - 32px))}
+.grid{grid-template-columns:1fr;gap:11px}
+.decision{grid-column:auto}
+.summary{margin:15px 0;padding:16px 20px}
+.panel{padding:14px 18px}
+.panel h2{margin-bottom:9px}
+.panel p{margin-bottom:7px}
+.problem{grid-template-columns:1fr;gap:6px}
+.problem div{padding:7px 10px}
+.actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.action{min-height:0;padding:8px 11px}
+.decision-inner{grid-template-columns:1fr;gap:9px}
+.decision .choices{grid-template-columns:1fr 1fr}
+.foot{margin-top:11px;padding:12px 16px}
+@media print{
+  @page{size:A4 portrait;margin:9mm}
+  html,body{width:100%;font-size:12px}
+  .page{width:100%;margin:0}
+  .masthead{padding-bottom:9px}
+  h1{font-size:20px;margin-bottom:3px}
+  .kicker{margin-bottom:4px}
+  .subtitle{font-size:11px}
+  .summary{margin:9px 0;padding:11px 14px;border-radius:8px;gap:12px}
+  .summary strong{font-size:15px}
+  .summary p,.summary .focus{font-size:10px}
+  .grid{display:grid;grid-template-columns:1fr;gap:7px}
+  .panel{padding:10px 13px;border-radius:8px;break-inside:avoid}
+  .panel h2{font-size:13px;margin-bottom:6px}
+  .panel p,.lines li,.problem div{font-size:11px}
+  .lines li{padding-bottom:3px}
+  .problem{gap:4px}.problem div{padding:5px 8px}
+  .actions{gap:5px}.action{padding:5px 8px;font-size:10px}.action b{font-size:11px;margin-bottom:1px}
+  .decision-inner{grid-template-columns:1fr 1.35fr;gap:10px}
+  .decision .core{padding:8px 10px}.decision .core strong{font-size:11px}.decision .core p{font-size:10px}
+  .decision .choices{gap:4px}.decision .choices span{padding:6px 7px;font-size:10px}
+  .foot{margin-top:7px;padding:8px 11px;gap:9px}.foot h2{font-size:12px}.foot p{font-size:10px}
+  .source{margin-top:6px;font-size:9px}
+}
+</style>
+</head>
+<body>
+<main class="page">
+<header class="masthead"><div><div class="kicker">EXECUTIVE BRIEF · 내부 검토용</div><h1>민원처리 현황 시각화 개선 추진계획(안)</h1><p class="subtitle">의사결정자를 위한 1페이지 요약 | 확인된 현황과 추진 제안 구분</p></div><span class="tag">검토안 · 확정 전</span></header>
+<section class="summary" aria-label="핵심 메시지"><div><strong>수작업 집계를 표준화하고, 민원 현황을 더 쉽게 파악하도록 개선</strong><p>공통 양식 · 주요 KPI 자동 계산 · 부서/상태/긴급도 필터 · 월별 추이 차트</p></div><div class="focus">우선 판단: 추진 범위와 시스템 변경 필요성</div></section>
+<div class="grid">
+<section class="panel"><h2><span class="num">01</span> 왜 필요한가</h2><p>월말마다 부서별 민원 현황을 수작업으로 취합하고 있음.</p><ul class="lines"><li>반복적인 자료 취합과 재확인 업무 개선 필요</li><li>긴급 민원·장기 미처리 건의 가시성 확보 필요</li><li>부서별 현황을 공통 기준으로 파악할 필요</li></ul></section>
+<section class="panel"><h2><span class="num">02</span> 현재 문제는 무엇인가</h2><div class="problem"><div><strong>자료 취합</strong> · 여러 파일의 수치를 복사해 보고자료 작성</div><div><strong>집계 기준</strong> · 부서별 기준 차이로 재확인 반복</div><div><strong>현황 파악</strong> · 긴급·장기 미처리 건을 한눈에 확인하기 어려움</div></div></section>
+<section class="panel"><h2><span class="num">03</span> 무엇을 추진하려는가 <span style="font-size:11px;font-weight:500;color:#738499">(제안)</span></h2><div class="actions"><div class="action"><b>집계 표준화</b>공통 입력 양식 및 분류 기준 마련</div><div class="action"><b>KPI 자동화</b>주요 지표 자동 계산 방식 설계</div><div class="action"><b>현황 조회</b>부서·상태·긴급도별 필터</div><div class="action"><b>추이 시각화</b>월별 민원 처리 추이 차트</div></div></section>
+<section class="panel"><h2><span class="num">04</span> 추진 시 준수·검토 사항</h2><ul class="lines"><li><strong>개인정보:</strong> 실제 개인정보는 대시보드에 표시하지 않음</li><li><strong>기존 시스템:</strong> 변경 필요 시 별도 검토</li><li><strong>실행 순서(안):</strong> 현황 분석 → 기준 설계 → 기능 구성 → 검증 → 운영 검토</li></ul><p style="margin-top:9px;color:#6b7e91;font-size:12px">※ 일정·예산·효과 수치는 확인되지 않아 기재하지 않음.</p></section>
+<section class="panel decision"><h2><span class="num">05</span> 어떤 결정이 필요한가</h2><div class="decision-inner"><div class="core"><strong>우선 의사결정</strong><p>적용 부서와 구축 기능의 범위를 정하고, 기존 시스템을 활용할지 및 변경이 필요한지 검토</p></div><div class="choices"><span>① 추진 범위 확정</span><span>② 시스템 변경 범위 검토</span><span>③ 추진 일정·예산 검토</span><span>④ 담당 부서·운영 책임 지정</span></div></div></section>
+</div>
+<section class="foot"><h2>추가로 확인해야 할 사항</h2><p>적용 대상 부서 · KPI 항목 및 산출 기준 · 긴급/장기 미처리 분류 기준 · 구축 일정 · 예산 · 담당 부서 · 운영 책임자 · 시스템 연계 필요성 · 성과 측정 기준</p></section>
+<footer class="source"><span>근거: 제공된 「민원처리 현황 시각화 개선」 기획 메모 및 기획서 초안</span><span>※ 기대효과 및 실행 절차는 제안이며, 확정된 사업계획이 아님.</span></footer>
+</main>
+</body>
+</html>
